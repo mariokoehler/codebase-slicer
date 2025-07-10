@@ -21,7 +21,7 @@ This tool is designed to solve the problem of analyzing or discussing large, com
 
 ## Download
 
-You can download the latest pre-compiled executable JAR from the [**GitHub Releases page**](https://github.com/YourUsername/codebase-slicer/releases).
+You can download the latest pre-compiled executable JAR from the [**GitHub Releases page**](https://github.com/mariokoehler/codebase-slicer/releases).
 
 ## Prerequisites
 
