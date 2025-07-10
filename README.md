@@ -19,6 +19,9 @@ This tool is designed to solve the problem of analyzing or discussing large, com
 -   **Java Version Aware:** Can be configured to correctly parse modern Java syntax (e.g., JDK 17, 21).
 -   **Single-File Output:** Concatenates all relevant files into one easy-to-use `.txt` file, with clear delimiters.
 
+## Download
+
+You can download the latest pre-compiled executable JAR from the [**GitHub Releases page**](https://github.com/YourUsername/codebase-slicer/releases).
 ## Prerequisites
 
 To build and run this tool, you will need:
@@ -28,6 +31,7 @@ To build and run this tool, you will need:
 
 ## Build Instructions
 
+If you prefer to build the project locally:
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/YourUsername/codebase-slicer.git
