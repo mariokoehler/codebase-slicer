@@ -59,13 +59,14 @@ java -jar /path/to/codebase-slicer-1.0.0-jar-with-dependencies.jar [ARGUMENTS]
 
 ### Arguments
 
-| Argument   | Description                                                            | Required | Example                                    |
-|------------|------------------------------------------------------------------------|----------|--------------------------------------------|
-| `-root`    | The fully qualified name of the class to start the analysis from.      | Yes      | `com.myproject.api.OrderController`        |
-| `-source`  | A comma-separated list of source directories to search for classes.    | Yes      | `src/main/java,src/test/java`              |
-| `-output`  | The filename for the final output file.                                | Yes      | `my_slice.txt`                             |
-| `-depth`   | The maximum depth of dependency traversal (0 = only the root class).   | Yes      | `2`                                        |
-| `-java`    | (Optional) The Java language level of the target project. Defaults to `LATEST`. | No       | `21`                                       |
+| Argument  | Description                                                            | Required | Example                                    |
+|-----------|------------------------------------------------------------------------|----------|--------------------------------------------|
+| `-root`   | The fully qualified name of the class to start the analysis from.      | Yes      | `com.myproject.api.OrderController`        |
+| `-source` | A comma-separated list of source directories to search for classes.    | Yes      | `src/main/java,src/test/java`              |
+| `-output` | The filename for the final output file.                                | Yes      | `my_slice.txt`                             |
+| `-depth`  | The maximum depth of dependency traversal (0 = only the root class).   | Yes      | `2`                                        |
+| `-java`   | (Optional) The Java language level of the target project. Defaults to `LATEST`. | No       | `21`                                       |
+| `-include`| (Optional) Comma-separated list of classes to include directly (no recursion). | No       | `com.myconfig.Constants,com.myutil.MyFactory` |
 
 ---
 
