@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  *
  * <h3>Usage:</h3>
  * <pre>{@code
- * java -jar codebase-slicer.jar -root <fully.qualified.ClassName> -source <path1,path2,...> -output <file.txt> -depth <num> [-java <version>]
+ * java -jar codebase-slicer.jar -root <...> -source <...> -output <...> -depth <...> [-java <...>] [-include <...>]
  * }</pre>
  *
  * <h3>Example:</h3>
@@ -46,7 +46,8 @@ import java.util.stream.Collectors;
  *      -source src/main/java,src/test/java ^
  *      -output order_service_test_slice.txt ^
  *      -depth 2 ^
- *      -java 21
+ *      -java 21 ^
+ *      -include com.myproject.config.ImportantConstants,com.myproject.utils.ReflectionHelper
  * }</pre>
  */
 public class CodebaseSlicer {
@@ -78,6 +79,7 @@ public class CodebaseSlicer {
      *   <li>Configures the JavaParser instance with the correct language level and symbol solver.</li>
      *   <li>Initializes the breadth-first search by adding the root class to the work queue.</li>
      *   <li>Processes the queue until it's empty, finding dependencies for each class.</li>
+     *   <li>Processes any additional classes specified with the -include flag.</li>
      *   <li>Writes the collected source files to the specified output file.</li>
      * </ol>
      *
@@ -91,11 +93,22 @@ public class CodebaseSlicer {
         String outputFile = argMap.get("-output");
         String depthStr = argMap.get("-depth");
         String javaVersionStr = argMap.getOrDefault("-java", "LATEST");
+        // --- NEW: Parse the -include argument ---
+        String includeStr = argMap.get("-include");
 
         if (rootClassName == null || sourceDirsStr == null || outputFile == null || depthStr == null) {
-            System.err.println("Usage: java -jar <jarfile> -root <com.example.MyClass> -source <path1,path2,...> -output <summary.txt> -depth <number> [-java <version>]");
+            // --- MODIFIED: Updated usage string ---
+            System.err.println("Usage: java -jar <jarfile> -root <com.example.MyClass> -source <path1,path2,...> -output <summary.txt> -depth <number> [-java <version>] [-include <class1,class2,...>]");
             System.err.println("Example: -root de.otto.payments.b2ccreditfraud.bonim.entities.repos.CustomerTypeRepository -source C:\\Users\\MKOEHLER\\intellij-workspace\\piranha_bonim\\src\\main\\java,C:\\Users\\MKOEHLER\\intellij-workspace\\piranha_bonim\\src\\test\\java -output customerTypeRepo_slice.txt -depth 2");
             return;
+        }
+
+        // --- NEW: Prepare list of explicitly included classes ---
+        List<String> explicitlyIncludedClasses = Collections.emptyList();
+        if (includeStr != null && !includeStr.trim().isEmpty()) {
+            explicitlyIncludedClasses = Arrays.stream(includeStr.split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
         }
 
         projectSourcePaths = Arrays.stream(sourceDirsStr.split(","))
@@ -140,6 +153,25 @@ public class CodebaseSlicer {
                 findDependencies(item);
             } catch (Exception e) {
                 System.err.println("Could not resolve or parse: " + item.qualifiedName + ". Skipping. Error: " + e.getMessage());
+            }
+        }
+
+        // --- NEW: Process the explicitly included classes without recursion ---
+        if (!explicitlyIncludedClasses.isEmpty()) {
+            System.out.println("\nProcessing explicitly included classes...");
+            for (String className : explicitlyIncludedClasses) {
+                // Check if it was already found by the dependency traversal
+                if (finalFileSet.containsKey(className)) {
+                    System.out.println("  -> " + className + " was already included by the dependency tree. Skipping.");
+                    continue;
+                }
+                Path filePath = convertQualifiedNameToPath(className);
+                if (filePath != null) {
+                    System.out.println("  -> Adding: " + className);
+                    finalFileSet.put(className, filePath);
+                } else {
+                    System.err.println("  -> Could not find source file for explicitly included class: " + className);
+                }
             }
         }
 
